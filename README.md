@@ -3,6 +3,8 @@ A Home assistant integration for Phillips WiZ Light bulbs
 
 This is a fork of https://github.com/sbidy/wiz_light/ and fixes several issues with the component. Please note that once these two PRs are merged you should use the original component as I do not aim at maintaining this one: (https://github.com/sbidy/wiz_light/pull/9, https://github.com/sbidy/pywizlight/pull/2)
 
+This fork is updating @angadsingh/wiz_light fork from main component to work on older HASS release 0.95.4 with Python release < 3.7. Changes made to existing code base to pull in all the async and rythm related changes that @angadsingh made below. Also the asyncio_dgram wrapper code has been integrated removing the dependeny of installing the module vthia pip as it is not compatible with Python release < 3.6. This was mainly changed as the original code from https://github.com/sbidy/wiz_light/  does not work for my env. Eventually it's best to use the component from the authors site. 
+
 Bug fixes:
  - Fixes https://github.com/sbidy/wiz_light/issues/6: make the whole component truly async using non-blocking UDP
  - Light control now works even when lights are set to a rhythm.
