@@ -1,7 +1,14 @@
 import asyncio
-import asyncio_dgram
+#import asyncio_dgram
+try:
+    from .aio import DatagramStream, DatagramServer, DatagramClient, Protocol
+except Exception: #ImportError
+    from aio import DatagramStream, DatagramServer, DatagramClient, Protocol
 import time
-from .wizlight import wizlight, PilotBuilder
+try:
+    from .wizlight import wizlight, PilotBuilder
+except Exception: #ImportError
+    from wizlight import wizlight, PilotBuilder
 import logging
 import sys
 
@@ -43,6 +50,8 @@ async def testbulb(bulb):
 	await asyncio.wait_for(bulb.turn_on(PilotBuilder(scene = 14)), wait_secs)
 	await asyncio.sleep(0.5)
 	await asyncio.wait_for(bulb.turn_on(PilotBuilder(scene = 24)), wait_secs)
+	await asyncio.sleep(0.5)
+	await asyncio.wait_for(bulb.turn_off(), wait_secs)
 
 	state = await bulb.updateState()
 	print(state.get_state())
@@ -58,8 +67,7 @@ async def testbulb(bulb):
 
 async def run_bulb_automation():
 	loop = asyncio.get_event_loop()
-	bulb1 = wizlight('192.168.1.58')
-	bulb2 = wizlight('192.168.1.7')
+	bulb1 = wizlight('192.168.15.64')
 	# await asyncio.gather(testbulb(bulb1), testbulb(bulb2), loop = loop)
 	state = await bulb1.updateState()
 	await bulb1.turn_on(PilotBuilder(scene = 14))
@@ -69,4 +77,6 @@ async def run_bulb_automation():
 	state = await bulb1.updateState()
 
 if __name__ == '__main__':	
-	asyncio.run(run_bulb_automation())
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(run_bulb_automation())
+        loop.close()
