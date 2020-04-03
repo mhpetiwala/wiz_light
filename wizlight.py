@@ -24,10 +24,17 @@
 import socket
 import json
 import asyncio
-import asyncio_dgram
+#import asyncio_dgram
+try:
+    from .aio import DatagramStream, DatagramServer, DatagramClient, Protocol, bind, connect, from_socket
+except Exception: #ImportError
+    from aio import DatagramStream, DatagramServer, DatagramClient, Protocol, bind, connect, from_socket
 import logging
 from time import time
-from .scenes import SCENES
+try:
+    from .scenes import SCENES
+except Exception: #ImportError
+    from scenes import SCENES
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -299,15 +306,18 @@ class wizlight:
 
         try:
             _LOGGER.debug("[wizlight {}, connid {}] connecting to UDP port".format(self.ip, connid))
-            stream = await asyncio.wait_for(asyncio_dgram.connect((self.ip, self.port)), timeout)
+            stream = await asyncio.wait_for(connect((self.ip, self.port)), timeout)
             _LOGGER.debug("[wizlight {}, connid {}] listening for response datagram".format(self.ip, connid))
 
-            receive_task = asyncio.create_task(self.receiveUDPwithTimeout(stream, timeout))
+
+            loop = asyncio.get_event_loop()
+            receive_task = loop.create_task(self.receiveUDPwithTimeout(stream, timeout))
 
             i = 0
             while not receive_task.done() and i < max_send_datagrams:
                 _LOGGER.debug("[wizlight {}, connid {}] sending command datagram {}: {}".format(self.ip, connid, i, message))
-                asyncio.create_task(stream.send(bytes(message, "utf-8")))
+                loop = asyncio.get_event_loop()
+                loop.create_task(stream.send(bytes(message, "utf-8")))
                 await asyncio.sleep(send_interval)
                 i += 1
 
