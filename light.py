@@ -10,8 +10,14 @@
 
 import logging
 import voluptuous as vol
-from .wizlight import wizlight, PilotBuilder, PilotParser
-from .scenes import SCENES
+try:
+    from .wizlight import wizlight, PilotBuilder, PilotParser
+except Exception: #ImportError
+    from wizlight import wizlight, PilotBuilder, PilotParser
+try:
+    from .scenes import SCENES
+except Exception: #ImportError
+    from scenes import SCENES
 from homeassistant.exceptions import InvalidStateError
 from homeassistant.core import callback
 
